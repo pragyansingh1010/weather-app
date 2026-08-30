@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather App</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #e8f4ff;
+            text-align: center;
+            margin: 0;
+            padding: 60px 20px;
+        }
+
+        .container {
+            width: 400px;
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px gray;
+        }
+
+        input {
+            width: 65%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 12px 18px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #333;
+            color: white;
+        }
+
+        #weather {
+            margin-top: 25px;
+        }
+
+        #temperature {
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        #error {
+            color: red;
+        }
+
+        img {
+            width: 80px;
+        }
+
+        @media (max-width: 450px) {
+            .container {
+                width: 90%;
+            }
+
+            input {
+                width: 55%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Weather App</h2>
+
+        <input type="text" id="city" placeholder="Enter city">
+
+        <button onclick="getWeather()">Search</button>
+
+        <div id="weather"></div>
+
+        <p id="error"></p>
+
+    </div>
+
+    <script>
+        const apiKey = "11b207444ba9c836e3ca49db09459e57";
+
+        async function getWeather() {
+            let city = document.getElementById("city").value.trim();
+
+            if (city == "") {
+                document.getElementById("error").innerHTML =
+                    "Please enter a city.";
+                document.getElementById("weather").innerHTML = "";
+                return;
+            }
+
+            document.getElementById("error").innerHTML =
+                "Loading...";
+
+            try {
+                let url =
+                    "https://api.weatherstack.com/current?access_key=" +
+                    apiKey +
+                    "&query=" +
+                    encodeURIComponent(city) +
+                    "&units=m";
+
+                let response = await fetch(url);
+                let data = await response.json();
+
+                if (data.error) {
+                    document.getElementById("weather").innerHTML = "";
+
+                    document.getElementById("error").innerHTML =
+                        data.error.info;
+
+                    return;
+                }
+
+                document.getElementById("error").innerHTML = "";
+
+                document.getElementById("weather").innerHTML =
+                    "<h2>" +
+                    data.location.name +
+                    ", " +
+                    data.location.country +
+                    "</h2>" +
+
+                    "<img src='" +
+                    data.current.weather_icons[0] +
+                    "'>" +
+
+                    "<p id='temperature'>" +
+                    data.current.temperature +
+                    " °C</p>" +
+
+                    "<p>Condition: " +
+                    data.current.weather_descriptions[0] +
+                    "</p>" +
+
+                    "<p>Humidity: " +
+                    data.current.humidity +
+                    "%</p>" +
+
+                    "<p>Wind Speed: " +
+                    data.current.wind_speed +
+                    " km/h</p>";
+            }
+            catch (error) {
+                document.getElementById("weather").innerHTML = "";
+
+                document.getElementById("error").innerHTML =
+                    "Unable to fetch weather data.";
+            }
+        }
+    </script>
+
+</body>
+</html>
